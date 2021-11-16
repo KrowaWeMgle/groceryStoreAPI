@@ -1,9 +1,11 @@
+//https://krowawemgle.github.io/groceryStoreAPI/
 // create a variable to store the products 'database' in
 var products;
 
 // use fetch to retrieve it, and report any errors that occur in the fetch operation
 // once the products have been successfully loaded and formatted as a JSON object
 // using response.json(), run the initialize() function
+/*
 fetch('products.json').then(function(response) {
   if(response.ok) {
     response.json().then(function(json) {
@@ -14,6 +16,31 @@ fetch('products.json').then(function(response) {
     console.log('Network request for products.json failed with response ' + response.status + ': ' + response.statusText);
   }
 });
+*/
+
+//XHR fetch
+function getProducts(){
+  var url = 'products.json';
+  var request = new XMLHttpRequest();
+  request.open('Get', url);
+  request.responseType = 'json';
+
+  request.onload = function(){
+    if(request.status === 200 || request.readyState === 4)
+    {
+      products = request.response;
+      initialize();
+    }
+    else {
+      console.log('Network request for products.json failed with response ' + response.status + ': ' + response.statusText);
+    }
+  }
+  request.send();
+}
+getProducts();
+
+
+
 
 // sets up the app logic, declares required variables, contains all the other functions
 function initialize() {
@@ -143,6 +170,7 @@ function initialize() {
   // fetchBlob uses fetch to retrieve the image for that product, and then sends the
   // resulting image display URL and product object on to showProduct() to finally
   // display it
+  /*
   function fetchBlob(product) {
     // construct the URL path to the image file from the product.image property
     var url = 'images/' + product.image;
@@ -161,6 +189,25 @@ function initialize() {
         console.log('Network request for "' + product.name + '" image failed with response ' + response.status + ': ' + response.statusText);
       }
     });
+  }
+  */
+  //XHR fetch
+  function fetchBlob(product) {
+    var url = 'images/' + product.image;
+    var request = new XMLHttpRequest();
+    request.open('GET', url);
+    request.responseType = 'blob';
+    request.onload = function(){
+      if(request.status === 200){
+        var blob = request.response;
+        var objectURL = URL.createObjectURL(blob);
+        showProduct(objectURL, product)
+      }
+      else {
+        console.log('Network request for "' + product.name + '" image failed with response ' + response.status + ': ' + response.statusText);
+      }
+    };
+    request.send();
   }
 
   // Display a product inside the <main> element
